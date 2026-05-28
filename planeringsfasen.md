@@ -16,7 +16,7 @@ Säkerhetsrisker:
 
 Säkerhetskrav: 
 1. Backend ska validera och rensa input, samt säkert hantera input från användare så att det inte kan tolkas som databaskommandon (t.ex parameterized queries för sql-databas, eller sanitering av input for MongoDB)
-2. Systemet ska inte tillåta användare att själva sätta eller ändra sin roll.
+2. Systemet ska inte tillåta användare att själva sätta eller ändra sin roll. 
 3. Systemet ska kräva inloggning för att en användare ska kunna se, skriva eller redigera meddelanden. 
 4. Innan redigering eller radering av ett meddelande ska systemet kontrollera att meddelandets id är kopplat till den inloggade användaren. 
 5. Lösenord ska aldrig lagras i klartext i databasen. 
