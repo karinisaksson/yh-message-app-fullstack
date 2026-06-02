@@ -146,6 +146,8 @@ app.get("/messages", authenticateUser, async (req, res) => {
 // if (!text || text.length < 3 || text.length > 140) {
 //   return res.status(400).json({ message: "Message must be between 3 and 140 characters" })
 // }
+
+//att authenicateUser finns med i app.post, gör att det krävs en giltig token för att skriva ett meddelande. Detta fanns redan med i koden från början. Uppfyller säkerhetskrav 3. 
 app.post("/messages", authenticateUser, async (req, res) => {
   const message = new Message({ message: req.body.message, user: req.user._id })
   try {
@@ -156,12 +158,14 @@ app.post("/messages", authenticateUser, async (req, res) => {
   }
 })
 
+//backend: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs en giltig token för att skriva ett meddelande. Detta fanns redan med i koden från början.
 app.patch("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
     if (!message) return res.status(404).json({ error: "Message not found" })
 
+    //här under säkerställs att endast ägaren av meddelandet kan redigera det, annars kan vem som helst redigera alla meddelanden. detta var med i koden från början och uppfyller säkerhetskrav 4.
     if (message.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "You can only edit your own messages" })
     }
@@ -175,17 +179,17 @@ app.patch("/messages/:id", authenticateUser, async (req, res) => {
   }
 })
 
-// här nedan, i app.delete saknas AuthenticateUser, vilket gör att vem som helst kan radera meddelanden utan att vara inloggad. Det är en säkerhetsrisk och bör åtgärdas genom att lägga till authenticateUser middleware i delete-routen. Det löser delvis krav 4, alltså att ägarskap ska kontrolleras innan radering av meddelanden. 
-app.delete("/messages/:id", async (req, res) => {
+// La till authenticateUser. Det löser delvis krav 4, alltså att ägarskap ska kontrolleras innan radering av meddelanden. 
+app.delete("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
     if (!message) return res.status(404).json({ error: "Message not found" })
 
-    // här behövs även läggas till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Detta gör att ägarskap av meddelande krävs vid radering, alltså mitt säkerhetskrav 4. 
-    //if (message.user.toString() !== req.user._id.toString()) {
-    //  return res.status(403).json({ error: "You can only delete your own messages" })
-    //}
+    // här lägger jag till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Säkerhetskrav 4. 
+    if (message.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "You can only delete your own messages" })
+    }
 
     await message.deleteOne()
     res.status(204).send()

@@ -87,20 +87,19 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
           </div>
         )}
 
-        {/* för att endast ägaren av meddelandet ska kunna radera bör isOwner läggas till som villkor på deleteknappen. Då visas den inte för andra användare, vilket är en del av mitt säkerhetskrav 4. */}
-        {/*{isOwner && <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>}*/}
+        {/* för att endast ägaren av meddelandet ska kunna radera har isOwner lagts till som villkor på deleteknappen. Då visas den inte för andra användare, vilket är en del av mitt säkerhetskrav 4. */}
         <div className="message-actions">
-          <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>
+          {isOwner && <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>}
 
           {isOwner && !isEditing && (
             <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button>
           )}
 
-          {isOwner && isEditing && (
+          {isOwner && isEditing && ( // “edit”-knappen dyker bara upp för den som är inloggad och äger meddelandet. säkerhetskrav 3 och 4. 
             <button type="button" className="save-btn" onClick={onSave}>💾</button>
           )}
 
-          {isOwner & isEditing && (
+          {isOwner && isEditing && (
             <button
               type="button"
               className="cancel-btn"
@@ -109,6 +108,7 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
                 setEditError("")
               }}
             >
+              ❌
             </button>
           )}
         </div>

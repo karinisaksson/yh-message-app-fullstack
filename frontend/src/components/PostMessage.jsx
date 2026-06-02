@@ -58,7 +58,7 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
 
   if (!user) {
     return <p id="login-prompt">Log in to see and write messages</p>
-  } //meddelandet ändrat för att förtydliga att användaren måste logga in för att både se och skriva meddelanden.
+  } // Om man inte är inloggad renderas inte formuläret för att skriva meddelanden. Meddelandet ändrat för att förtydliga att användaren måste logga in för att både se och skriva meddelanden.
 
   return (
     <div id="post-form-wrapper" className="post-wrapper">
