@@ -28,12 +28,12 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
     }
   }
 
-  //lägger här in validering i frontenden att meddelande som redigeras måste vara mellan 3 och 140 tecken. säkerhetskrav 10. 
-  if (editedText.length < 3 || editedText.length > 140) {
-    setEditError("Message must be between 3 and 140 characters")
-    return
-  }
   const onSave = async () => {
+    //lägger här in validering i frontenden att meddelande som redigeras måste vara mellan 3 och 140 tecken. säkerhetskrav 10. 
+    if (editedText.length < 3 || editedText.length > 140) {
+      setEditError("Message must be between 3 and 140 characters")
+      return
+    }
     try {
       const res = await fetch(`${BASE_URL}/messages/${message._id}`, {
         method: "PATCH",
