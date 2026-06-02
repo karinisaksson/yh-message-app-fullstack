@@ -1,12 +1,12 @@
 import mongoose from "mongoose"
 
-// för att definiera hur lång meddelandet får vara, skriv in  
-//   minlength: 3,
-// maxlength: 140 (efter required:true)
+// hängsle och livrem för att stppa inlägg som är för korta eller för långa
 const messageSchema = new mongoose.Schema({
   message: {
     type: String,
     required: true,
+    minlength: 3,
+    maxlength: 140
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,

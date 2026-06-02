@@ -140,15 +140,12 @@ app.get("/messages", authenticateUser, async (req, res) => {
     res.status(500).json({ message: "Could not fetch messages" })
   }
 })
-// för att validera att meddelandet är mellan 3 och 140 tecken hanterar jag eventuella valideringsfel i app.post efter första måsvingen 
-// app.post("/messages", authenticateUser, async (req, res) => {
-// const text = req.body.message
-// if (!text || text.length < 3 || text.length > 140) {
-//   return res.status(400).json({ message: "Message must be between 3 and 140 characters" })
-// }
-
 //att authenicateUser finns med i app.post, gör att det krävs en giltig token för att skriva ett meddelande. Detta fanns redan med i koden från början. Uppfyller säkerhetskrav 3. 
 app.post("/messages", authenticateUser, async (req, res) => {
+  const text = req.body.message
+  if (!text || text.length < 3 || text.length > 140) {
+    return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // detta är en del av säkerhetskrav 10, begränsing av längd på meddelanden.
+  }
   const message = new Message({ message: req.body.message, user: req.user._id })
   try {
     const saved = await message.save()
@@ -168,6 +165,11 @@ app.patch("/messages/:id", authenticateUser, async (req, res) => {
     //här under säkerställs att endast ägaren av meddelandet kan redigera det, annars kan vem som helst redigera alla meddelanden. detta var med i koden från början och uppfyller säkerhetskrav 4.
     if (message.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "You can only edit your own messages" })
+    }
+    // här lägger jag till en kontroll för att säkerställa att meddelandet är mellan 3 och 140 tecken, annars kan användare skicka in väldigt långa eller väldigt korta meddelanden. Detta är en del av säkerhetskrav 10.
+    const editedText = req.body.editedMessage
+    if (!editedText || editedText.length < 3 || editedText.length > 140) {
+      return res.status(400).json({ error: "Message must be between 3 and 140 characters" })
     }
 
     message.message = req.body.editedMessage
