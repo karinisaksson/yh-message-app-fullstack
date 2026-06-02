@@ -28,6 +28,11 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
     }
   }
 
+  //lägg här in validering i frontenden att ändringen av meddelandet måste vara mellan 3 och 140 tecken och att användaren inte kan skapa ett tomt meddelande. 
+  // if (editedText.length < 3 || editedText.length > 140) {
+  //  setEditError("Message must be between 3 and 140 characters")
+  //  return
+  // }
   const onSave = async () => {
     try {
       const res = await fetch(`${BASE_URL}/messages/${message._id}`, {
@@ -82,6 +87,8 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
           </div>
         )}
 
+        {/* för att endast ägaren av meddelandet ska kunna radera bör isOwner läggas till som villkor på deleteknappen. Då visas den inte för andra användare, vilket är en del av mitt säkerhetskrav 4. */}
+        {/*{isOwner && <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>}*/}
         <div className="message-actions">
           <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>
 
@@ -102,7 +109,6 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
                 setEditError("")
               }}
             >
-              ❌
             </button>
           )}
         </div>

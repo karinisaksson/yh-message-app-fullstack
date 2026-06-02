@@ -17,7 +17,9 @@ const PORT = process.env.PORT || "3000"
 const app = express()
 app.use(helmet())
 app.use(cors({
-  origin: "*",
+  origin: "*", // vilken webbsida som helst på internet kan skicka requests till min API. kan blir ett säkerhetsproblem. tillåter alla domäner att skicka requests till API:et, vilket är dålig praxis i produktion men inte direkt kopplat till något av mina säkerhetskrav.
+  // bör ändras till app.use(cors({origin: min-frontends-url}))
+
 }))
 app.use(express.json())
 
@@ -123,6 +125,7 @@ app.post("/login", async (req, res) => {
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
+//lägg till authenticateUser i app.get("/messages") så att endast inloggade användare kan se meddelanden. Det är en del av mitt säkerhetskrav 1, alltså att endast autentiserade användare ska kunna se meddelanden.
 app.get("/messages", async (req, res) => {
   try {
     const messages = await Message.find()
@@ -135,7 +138,12 @@ app.get("/messages", async (req, res) => {
     res.status(500).json({ message: "Could not fetch messages" })
   }
 })
-
+// för att validera att meddelandet är mellan 3 och 140 tecken hanterar jag eventuella valideringsfel i app.post efter första måsvingen 
+// app.post("/messages", authenticateUser, async (req, res) => {
+// const text = req.body.message
+// if (!text || text.length < 3 || text.length > 140) {
+//   return res.status(400).json({ message: "Message must be between 3 and 140 characters" })
+// }
 app.post("/messages", authenticateUser, async (req, res) => {
   const message = new Message({ message: req.body.message, user: req.user._id })
   try {
@@ -165,11 +173,18 @@ app.patch("/messages/:id", authenticateUser, async (req, res) => {
   }
 })
 
+// här nedan, i app.delete saknas AuthenticateUser, vilket gör att vem som helst kan radera meddelanden utan att vara inloggad. Det är en säkerhetsrisk och bör åtgärdas genom att lägga till authenticateUser middleware i delete-routen. Det löser delvis krav 4, alltså att ägarskap ska kontrolleras innan radering av meddelanden. 
 app.delete("/messages/:id", async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
     if (!message) return res.status(404).json({ error: "Message not found" })
+
+    // här behövs även läggas till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Detta gör att ägarskap av meddelande krävs vid radering, alltså mitt säkerhetskrav 4. 
+    //if (message.user.toString() !== req.user._id.toString()) {
+    //  return res.status(403).json({ error: "You can only delete your own messages" })
+    //}
+
     await message.deleteOne()
     res.status(204).send()
   } catch (error) {

@@ -22,8 +22,12 @@ export const App = () => {
   useEffect(() => {
     fetchPosts()
   }, [])
+  // denna bör göras om såhär: 
+  //useEffect(() => {
+  //  if (user) fetchPosts()
+  //}, [user])
 
-    const addNewPost = (newMessage) => {
+  const addNewPost = (newMessage) => {
     setMessageList([newMessage, ...messageList])
   }
 
@@ -31,43 +35,43 @@ export const App = () => {
     setUser(null)
     setError("Your session has expired, please log in again")
   }
-    
+
   return (
     <>
-        {user ? (
-          <div className="user-info">
-            <span>{user.response.username}</span>
-            <button
-              onClick={() => setUser(null)}
-              className="auth-button"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="auth-buttons">
-            <button
-              onClick={() => setModal("login")}
-              className="auth-button"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setModal("register")}
-              className="auth-button"
-            >
-              Register
-            </button>
-          </div>
-        )}
+      {user ? (
+        <div className="user-info">
+          <span>{user.response.username}</span>
+          <button
+            onClick={() => setUser(null)}
+            className="auth-button"
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <div className="auth-buttons">
+          <button
+            onClick={() => setModal("login")}
+            className="auth-button"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => setModal("register")}
+            className="auth-button"
+          >
+            Register
+          </button>
+        </div>
+      )}
       {modal && (
         <AuthModal
           mode={modal}
           onClose={() => setModal(null)}
-          onSuccess={(data) => { 
+          onSuccess={(data) => {
             console.log("User logged in:", data)
-            setUser(data) 
-            setModal(null) 
+            setUser(data)
+            setModal(null)
           }}
         />
       )}
@@ -80,6 +84,16 @@ export const App = () => {
         fetchPosts={fetchPosts}
         user={user}
         onUnauthorized={handleUnauthorized}
+
+      // för att endast inloggade användare ska kunna se meddelanden bör MessageList inte renderas alls om user är null, alltså om ingen är inloggad. Det är en del av mitt säkerhetskrav 1.
+      //{user && <MessageList
+      //  loading={loading}
+      //  messageList={messageList}
+      //  setMessageList={setMessageList}
+      //  fetchPosts={fetchPosts}
+      //  user={user}
+      //  onUnauthorized={handleUnauthorized}
+      ///>}
       />
     </>
   )

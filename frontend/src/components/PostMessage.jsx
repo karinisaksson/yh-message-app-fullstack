@@ -10,6 +10,13 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
     event.preventDefault()
     setSubmitting(true)
 
+    //  detta sätts in för att validera i frontenden att meddelandet är mellan 3 och 140 tecken, och att användaren inte kan skicka in ett tomt meddelande. 
+    // if (newPost.length < 3 || newPost.length > 140) {
+    //    setErrorMessage("Message must be between 3 and 140 characters")
+    //    setSubmitting(false)
+    //    return
+    //  }
+
     try {
       const res = await fetch(`${BASE_URL}/messages`, {
         method: "POST",
