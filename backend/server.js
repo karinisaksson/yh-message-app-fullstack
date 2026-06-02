@@ -46,7 +46,8 @@ app.post("/register", async (req, res) => {
         message: `A user with this ${field} already exists`
       })
     }
-
+    // här hashas lösenord med bcrypt innan det sparas i databasen, vilket åtgärdar säkerhetsåtgärd 5. 
+    // bcrypt är en envägsfunktion, lösenordet kan inte återskapas från hashen.
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = new User({ username: username.trim(), email, password: hashedPassword })
     await user.save()
@@ -90,6 +91,7 @@ app.post("/login", async (req, res) => {
       })
     }
 
+    // här jämförs det angivna lösenordet med det hashade lösenordet i databasen, vilket är en del av säkerhetsåtgärd 5. 
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return res.status(401).json({
