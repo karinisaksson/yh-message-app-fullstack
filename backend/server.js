@@ -127,8 +127,8 @@ app.post("/login", async (req, res) => {
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
-//lägg till authenticateUser i app.get("/messages") så att endast inloggade användare kan se meddelanden. Det är en del av mitt säkerhetskrav 1, alltså att endast autentiserade användare ska kunna se meddelanden.
-app.get("/messages", async (req, res) => {
+//lagt till authenticateUser i app.get("/messages") så att endast inloggade användare kan se meddelanden. Det är en del av mitt säkerhetskrav 3, alltså att endast inloggade användare ska kunna se meddelanden.
+app.get("/messages", authenticateUser, async (req, res) => {
   try {
     const messages = await Message.find()
       .sort({ createdAt: "desc" })

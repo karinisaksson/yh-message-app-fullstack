@@ -100,7 +100,7 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
             <button type="button" className="save-btn" onClick={onSave}>💾</button>
           )}
 
-          {isOwner && isEditing && (
+          {isOwner & isEditing && (
             <button
               type="button"
               className="cancel-btn"

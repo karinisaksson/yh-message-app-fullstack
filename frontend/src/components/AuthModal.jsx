@@ -29,10 +29,10 @@ export const AuthModal = ({ mode, onClose, onSuccess }) => {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || "Something went wrong")
 
-      console.log("Auth successful:", data)
+      //  console.log("Auth successful:", data) tog bort console.log för att inte exponera token
       onSuccess(data)
     } catch (err) {
-      console.log(err)
+      //  console.log(err) tog även bort denna för att inte exponera felmeddelanden med känslig information om tex filnamn och radnummer i min kod. 
       setError(err.message)
     } finally {
       setSubmitting(false)

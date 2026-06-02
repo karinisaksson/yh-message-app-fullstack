@@ -19,13 +19,15 @@ export const App = () => {
       .catch((error) => console.error(error))
       .finally(() => setLoading(false))
   }
+
   useEffect(() => {
-    fetchPosts()
-  }, [])
-  // denna bör göras om såhär: 
+    if (user) fetchPosts()
+  }, [user])
+
+  // ovan har gjorts om för att endast inloggade användare ska kunna se meddelanden. Nedan är den tidigare versionen där fetchPosts kördes varje gång appen laddades, oavsett om en användare var inloggad eller inte. Det är en del av mitt säkerhetskrav 4, alltså att endast autentiserade användare ska kunna se meddelanden.
   //useEffect(() => {
-  //  if (user) fetchPosts()
-  //}, [user])
+  //  fetchPosts()
+  // }, [])
 
   const addNewPost = (newMessage) => {
     setMessageList([newMessage, ...messageList])
@@ -69,7 +71,7 @@ export const App = () => {
           mode={modal}
           onClose={() => setModal(null)}
           onSuccess={(data) => {
-            console.log("User logged in:", data)
+            //    console.log("User logged in:", data) - borttagen för att inte exponera token i konsolen, vilket är del av säkerhetskrav 3. det är lättare att komma över en token som exponeras i konsolen och på så sätt ta sig in i en annans konto och kunna ändra eller ta bort meddelanden.
             setUser(data)
             setModal(null)
           }}
@@ -85,7 +87,7 @@ export const App = () => {
         user={user}
         onUnauthorized={handleUnauthorized}
 
-      // för att endast inloggade användare ska kunna se meddelanden bör MessageList inte renderas alls om user är null, alltså om ingen är inloggad. Det är en del av mitt säkerhetskrav 1.
+      // för att endast inloggade användare ska kunna se meddelanden bör MessageList inte renderas alls om user är null, alltså om ingen är inloggad. detta kanske inte behövs enligt claude??
       //{user && <MessageList
       //  loading={loading}
       //  messageList={messageList}

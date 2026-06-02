@@ -27,7 +27,8 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
         body: JSON.stringify({ message: newPost }),
       })
 
-      console.log("Token being sent:", user?.response?.accessToken)
+      // tar bort denna console.log för att inte token ska kunna ses i konsolen. det är en del av mitt säkerhetskrav 3, eftersom det är lättare att komma över en token som exponeras i konsolen och på så sätt ta sig in i en annans konto och kunna ändra eller ta bort meddelanden.
+      //    console.log("Token being sent:", user?.response?.accessToken)
 
       if (res.status === 401) {
         onUnauthorized()
@@ -56,8 +57,8 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
   }
 
   if (!user) {
-    return <p id="login-prompt">Log in to write a message</p>
-  }
+    return <p id="login-prompt">Log in to see and write messages</p>
+  } //meddelandet ändrat för att förtydliga att användaren måste logga in för att både se och skriva meddelanden.
 
   return (
     <div id="post-form-wrapper" className="post-wrapper">
