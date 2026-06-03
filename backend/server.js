@@ -91,7 +91,7 @@ app.post("/login", async (req, res) => {
       })
     }
 
-    // här jämförs det angivna lösenordet med det hashade lösenordet i databasen, vilket är en del av säkerhetsåtgärd 5. 
+    // här jämförs det angivna lösenordet som hashas med det hashade lösenordet i databasen, vilket är en del av säkerhetsåtgärd 5. 
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return res.status(401).json({
