@@ -10,6 +10,7 @@ import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
+import rateLimit from "express-rate-limit" // importerar express-rate-limit för att implementera rate limiting, vilket är en del av säkerhetskrav 6. 
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -22,6 +23,12 @@ app.use(cors({
 
 }))
 app.use(express.json())
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: "Too many login attempts, please try again after 15 minutes" }
+})
+// här har jag lagt in en variabel LoginLimiter som använder express-rate-limit för att begränsa antalet inloggningsförsök till 5 per 15 minuter. Detta är en del av säkerhetskrav 6, som handlar om att implementera rate limiting för att skydda mot brute-force attacker. Sedan använder jag loginLimiter som middleware i app.post("/login") för att tillämpa denna begränsning på inloggningsförsöken.
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
@@ -76,7 +83,8 @@ app.post("/register", async (req, res) => {
   }
 })
 
-app.post("/login", async (req, res) => {
+//lagt till middlewaren loginLimiter för att begränsa antalet inloggningsförsök, vilket är en del av säkerhetskrav 6.
+app.post("/login", loginLimiter, async (req, res) => {
   try {
     const { login, password } = req.body
     const user = await User.findOne({
