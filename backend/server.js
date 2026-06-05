@@ -195,6 +195,7 @@ app.delete("/messages/:id", authenticateUser, async (req, res) => {
 
     // här lägger jag till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Säkerhetskrav 4. 
     if (message.user.toString() !== req.user._id.toString()) {
+      console.log(`BLOCKED: User ${req.user._id} tried to delete message owned by ${message.user}`)
       return res.status(403).json({ error: "You can only delete your own messages" })
     }
 
