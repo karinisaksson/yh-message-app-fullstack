@@ -11,6 +11,7 @@ import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
 import rateLimit from "express-rate-limit" // importerar express-rate-limit för att implementera rate limiting, vilket är en del av säkerhetskrav 6. 
+import mongoSanitize from "express-mongo-sanitize" //importerar för att sanera input och skydda mot NoSQL-injection, vilket är en del av säkerhetskrav 1. 
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -23,6 +24,7 @@ app.use(cors({
 
 }))
 app.use(express.json())
+app.use(mongoSanitize()) // här används mongoSanitize middleware för att sanera input och skydda mot NoSQL-injection
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
