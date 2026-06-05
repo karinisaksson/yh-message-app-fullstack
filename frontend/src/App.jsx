@@ -11,9 +11,23 @@ export const App = () => {
   const [modal, setModal] = useState(null)
   const [error, setError] = useState(null)
 
+  //  const fetchPosts = () => {
+  //    setLoading(true)
+  //    fetch(`${BASE_URL}/messages`)
+  //      .then((res) => res.json())
+  //      .then((data) => setMessageList(data))
+  //      .catch((error) => console.error(error))
+  //      .finally(() => setLoading(false))
+  //  }
+
+  //nedan är ny fetchPosts variabel. När vi la till authenticateUser på GET /messages i backenden som en del av säkerhetskrav 3, att endast inloggade ska kunna se meddelanden, behövde frontenden också skicka med JWT-token i varje anrop, annars svarar backenden med 401 och inga meddelanden visas. Funktionen hämtar nu meddelanden från backenden och skickar nu med en Authorization-header som innehåller användarens JWT-token. Backenden använder token för att verifiera att användaren är inloggad innan den returnerar meddelandena. Utan token blockeras anropet av authenticateUser-middleware och inga meddelanden skickas tillbaka.
   const fetchPosts = () => {
     setLoading(true)
-    fetch(`${BASE_URL}/messages`)
+    fetch(`${BASE_URL}/messages`, {
+      headers: {
+        Authorization: `Bearer ${user?.response?.accessToken}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setMessageList(data))
       .catch((error) => console.error(error))
