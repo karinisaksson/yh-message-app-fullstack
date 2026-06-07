@@ -11,16 +11,7 @@ export const App = () => {
   const [modal, setModal] = useState(null)
   const [error, setError] = useState(null)
 
-  //  const fetchPosts = () => {
-  //    setLoading(true)
-  //    fetch(`${BASE_URL}/messages`)
-  //      .then((res) => res.json())
-  //      .then((data) => setMessageList(data))
-  //      .catch((error) => console.error(error))
-  //      .finally(() => setLoading(false))
-  //  }
-
-  //nedan är ny fetchPosts variabel. När vi la till authenticateUser på GET /messages i backenden som en del av säkerhetskrav 3, att endast inloggade ska kunna se meddelanden, behövde frontenden också skicka med JWT-token i varje anrop, annars svarar backenden med 401 och inga meddelanden visas. Funktionen hämtar nu meddelanden från backenden och skickar nu med en Authorization-header som innehåller användarens JWT-token. Backenden använder token för att verifiera att användaren är inloggad innan den returnerar meddelandena. Utan token blockeras anropet av authenticateUser-middleware och inga meddelanden skickas tillbaka.
+  //nedan är ny fetchPosts variabel. När vi la till authenticateUser på GET /messages i backenden som en del av säkerhetskrav 3, att endast inloggade ska kunna se meddelanden, behövde frontenden också skicka med JWT-token i varje anrop, annars svarar backenden med 401 och inga meddelanden visas. Funktionen hämtar nu meddelanden från backenden och skickar  med en Authorization-header som innehåller användarens JWT-token. Backenden använder token för att verifiera att användaren är inloggad innan den returnerar meddelandena. Utan token blockeras anropet av authenticateUser-middleware och inga meddelanden skickas tillbaka.
   const fetchPosts = () => {
     setLoading(true)
     fetch(`${BASE_URL}/messages`, {
@@ -93,24 +84,14 @@ export const App = () => {
       )}
       {error && <p className="error">{error}</p>}
       <PostMessage newMessage={addNewPost} fetchPosts={fetchPosts} user={user} onUnauthorized={handleUnauthorized} />
-      <MessageList
+      {user && <MessageList
         loading={loading}
         messageList={messageList}
         setMessageList={setMessageList}
         fetchPosts={fetchPosts}
         user={user}
         onUnauthorized={handleUnauthorized}
-
-      // för att endast inloggade användare ska kunna se meddelanden bör MessageList inte renderas alls om user är null, alltså om ingen är inloggad. detta kanske inte behövs enligt claude??
-      //{user && <MessageList
-      //  loading={loading}
-      //  messageList={messageList}
-      //  setMessageList={setMessageList}
-      //  fetchPosts={fetchPosts}
-      //  user={user}
-      //  onUnauthorized={handleUnauthorized}
-      ///>}
-      />
-    </>
+      />}
+    </> //La till {user && så att Messagelist bara renderas om användaren är inloggad, så att ej autentiserade användare inte kan se meddelanden — del av säkerhetskrav 3
   )
 }

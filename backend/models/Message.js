@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 
-// hängsle och livrem för att stoppa att databasen sparar inlägg som är för korta eller för långa
+// Här stoppas att databasen sparar inlägg som är för korta eller för långa. Del av säkerhetskrav 10. 
 const messageSchema = new mongoose.Schema({
   message: {
     type: String,
