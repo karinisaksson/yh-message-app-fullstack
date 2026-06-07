@@ -20,12 +20,12 @@ const PORT = process.env.PORT || "3000"
 const app = express()
 app.use(helmet())
 app.use(cors({
-  origin: "*", // vilken webbsida som helst på internet kan skicka requests till min API. kan blir ett säkerhetsproblem. tillåter alla domäner att skicka requests till API:et, vilket är dålig praxis i produktion men inte direkt kopplat till något av mina säkerhetskrav.
+  origin: "*", // app.use inställt med stjärnan som origin innebär att alla domäner på internet kan skicka requests till min API. Det kan blir ett säkerhetsproblem, och är dålig praxis i produktion. 
   // bör ändras till app.use(cors({origin: min-frontends-url}))
 
 }))
 app.use(express.json())
-app.use(mongoSanitize()) // här används mongoSanitize för att sanera input och skydda mot NoSQL-injection
+app.use(mongoSanitize()) // här används mongoSanitize för att sanera input och skydda mot NoSQL-injection. Säkerhetskrav 1. 
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
@@ -160,7 +160,7 @@ app.post("/messages", authenticateUser, async (req, res) => {
   }
 })
 
-//backend: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs en giltig token för att skriva ett meddelande. Detta fanns redan med i koden från början.
+//backend: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs en giltig token för att redigera ett meddelande. Detta fanns redan med i koden från början.
 app.patch("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
@@ -195,7 +195,7 @@ app.delete("/messages/:id", authenticateUser, async (req, res) => {
 
     // här lägger jag till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Säkerhetskrav 4. 
     if (message.user.toString() !== req.user._id.toString()) {
-      console.log(`BLOCKED: User ${req.user._id} tried to delete message owned by ${message.user}`)
+      console.log(`BLOCKED: User ${req.user._id} tried to delete message owned by ${message.user}`) //console.log för att testa så att det fungerar
       return res.status(403).json({ error: "You can only delete your own messages" })
     }
 

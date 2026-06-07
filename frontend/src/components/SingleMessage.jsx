@@ -92,10 +92,10 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
           {isOwner && <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>}
 
           {isOwner && !isEditing && (
-            <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button>
+            <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button> // “edit”-knappen dyker bara upp för den som är inloggad och äger meddelandet. Detta var redan med från början. Säkerhetskrav 3 och 4.
           )}
 
-          {isOwner && isEditing && ( // “edit”-knappen dyker bara upp för den som är inloggad och äger meddelandet. säkerhetskrav 3 och 4. 
+          {isOwner && isEditing && (
             <button type="button" className="save-btn" onClick={onSave}>💾</button>
           )}
 
