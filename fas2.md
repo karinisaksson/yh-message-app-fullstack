@@ -38,7 +38,7 @@ Detta la jag till genom rate-limiting. Se ny middleware i rateLimiter.js och anv
 
 7. Krav: För att återställa lösenord krävs en engångskod skickad till användarens e-post. 
 
-För att implementera lösenordsåterställning via engångskod behövs flera delar. För det första behövs e funktion för att återställa lösenordet, samt en e-posttjänst, till exempel Nodemailer, som kan skicka ett e-postmeddelande med en engångskod till användaren.
+För att implementera lösenordsåterställning via engångskod behövs flera delar. För det första behövs en funktion för att återställa lösenordet, samt en e-posttjänst, till exempel Nodemailer, som kan skicka ett e-postmeddelande med en engångskod till användaren.
 
 Implementationen skulle börja med en POST /forgot-password-route som tar emot användarens e-postadress, genererar en tidsbegränsad engångskod och skickar den till användaren via e-post med exempelvis Nodemailer. 
 
@@ -49,9 +49,9 @@ Därefter behövs en POST /reset-password-route där användaren anger koden til
 
 8. Krav: All kommunikation ska vara krypterad via HTTPS och TLS. 
 
-För att anropen ska ske via HTTPS är det viktigt att BASE_URL i api.js pekar mot en https-adress. Just nu är URL:n i api.js en lokal host för utveckling, som går över http, men i produktion måste det vara en HTTPS-adress för att uppfylla säkerhetskravet-  
+För att anropen ska ske via HTTPS är det viktigt att BASE_URL i api.js pekar mot en https-adress. Just nu är URL:n i api.js en lokal host för utveckling, som går över http, men i produktion måste det vara en HTTPS-adress för att uppfylla säkerhetskravet. 
 
-För att kommunikationen ska vara krypterad enligt TLS behöver vi skaffa ett TLS-certifikat, och en reverse-proxy som tar emot https-anrop, dekrypterar och vidarebefordrar anropen till min vår express-server. 
+För att kommunikationen ska vara krypterad enligt TLS behöver vi skaffa ett TLS-certifikat. Det fixas inte i koden utan när vi deployar. 
 
 9. Systemet ska logga vem som skapade, redigerade och raderade varje meddelande. 
 
