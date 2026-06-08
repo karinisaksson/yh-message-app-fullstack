@@ -25,7 +25,7 @@ app.use(cors({
 
 }))
 app.use(express.json())
-app.use(mongoSanitize()) //Säkerhetskrav 1. Här används mongoSanitize för att sanera input och skydda mot NoSQL-injection.
+app.use(mongoSanitize()) //Säkerhetskrav 1. Här används mongoSanitize för att sanera input och skydda mot NoSQL-injection. Vilket innebär att all inkommande request-data (body, params, query) automatiskt rensas från MongoDB-operatorer som $ och . innan de når någon route.
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
