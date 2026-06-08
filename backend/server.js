@@ -20,7 +20,7 @@ const PORT = process.env.PORT || "3000"
 const app = express()
 app.use(helmet())
 app.use(cors({
-  origin: "*", // app.use inställt med stjärnan som origin innebär att alla domäner på internet kan skicka requests till min API. Det kan blir ett säkerhetsproblem, och är dålig praxis i produktion. 
+  origin: "*", //Extra: app.use(cors inställt med * som origin innebär att alla domäner på internet kan skicka requests till min API. Det kan bli ett säkerhetsproblem, och är dålig praxis i produktion. 
   // bör ändras till app.use(cors({origin: min-frontends-url}))
 
 }))
