@@ -10,7 +10,7 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
     event.preventDefault()
     setSubmitting(true)
 
-    //  detta sätts in för att validera i frontenden att meddelandet som postas är mellan 3 och 140 tecken, säkerhetskrav 10. 
+    // Säkerhetskrav 10. Detta sätts in för att validera i frontenden att meddelandet som postas är mellan 3 och 140 tecken. 
     if (newPost.length < 3 || newPost.length > 140) {
       setErrorMessage("Message must be between 3 and 140 characters")
       setSubmitting(false)
@@ -58,7 +58,7 @@ export const PostMessage = ({ newMessage, fetchPosts, user, onUnauthorized }) =>
 
   if (!user) {
     return <p id="login-prompt">Log in to see and write messages</p>
-  } // Om man inte är inloggad renderas inte formuläret för att skriva meddelanden. Meddelandet ändrat för att förtydliga att användaren måste logga in för att både se och skriva meddelanden. säkerhetskrav 3. 
+  } //Säkerhetskrav 3. Denna kodrad gör att formuläret för att skriva ett meddelande inte renderas om man inte är inloggad. Meddelandet som visas har jag ändrat för att förtydliga att användaren måste logga in för att både se och skriva meddelanden. 
 
   return (
     <div id="post-form-wrapper" className="post-wrapper">

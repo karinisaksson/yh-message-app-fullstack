@@ -11,8 +11,8 @@ import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
 import { loginLimiter } from "./middleware/rateLimiter.js"
-// importerar middlewaren loginLimiter, vilket är en del av säkerhetskrav 6. 
-import mongoSanitize from "express-mongo-sanitize" //importerar för att sanera input och skydda mot NoSQL-injection, vilket är en del av säkerhetskrav 1. 
+// Säkerhetskrav 6: Importerar middlewaren loginLimiter
+import mongoSanitize from "express-mongo-sanitize" //Säkerhetskrav 1: Importerar för att sanera input och skydda mot NoSQL-injection. 
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -25,7 +25,7 @@ app.use(cors({
 
 }))
 app.use(express.json())
-app.use(mongoSanitize()) // här används mongoSanitize för att sanera input och skydda mot NoSQL-injection. Säkerhetskrav 1. 
+app.use(mongoSanitize()) //Säkerhetskrav 1. Här används mongoSanitize för att sanera input och skydda mot NoSQL-injection.
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
@@ -50,7 +50,7 @@ app.post("/register", async (req, res) => {
         message: `A user with this ${field} already exists`
       })
     }
-    // här hashas lösenord med bcrypt innan det sparas i databasen, vilket åtgärdar säkerhetskrav 5. 
+    // Säkerhetskrav 5. Här hashas lösenord med bcrypt innan det sparas i databasen. Detta fanns med från början i koden. 
     // bcrypt är en envägsfunktion, lösenordet kan inte återskapas från hashen.
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = new User({ username: username.trim(), email, password: hashedPassword })
@@ -80,7 +80,7 @@ app.post("/register", async (req, res) => {
   }
 })
 
-//lagt till middlewaren loginLimiter för att begränsa antalet inloggningsförsök, vilket är en del av säkerhetskrav 6.
+//Säkerhetskrav 6: Lagt till middlewaren loginLimiter för att begränsa antalet inloggningsförsök. 
 app.post("/login", loginLimiter, async (req, res) => {
   try {
     const { login, password } = req.body
@@ -96,7 +96,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       })
     }
 
-    // här jämförs det angivna lösenordet som hashas med det hashade lösenordet i databasen, vilket är en del av säkerhetsåtgärd 5. 
+    // Säkerhetskrav 5: Här jämförs det angivna lösenordet som hashas med det hashade lösenordet i databasen. Detta fanns från början och jag har inte ändrat något. 
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return res.status(401).json({
@@ -132,7 +132,7 @@ app.post("/login", loginLimiter, async (req, res) => {
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
-//lagt till authenticateUser i app.get("/messages") så att endast inloggade användare kan se meddelanden. Det är en del av mitt säkerhetskrav 3, alltså att endast inloggade användare ska kunna se meddelanden.
+//Säkerhetskrav 3. Lagt till middlewaren authenticateUser så att endast inloggade användare kan se meddelanden.
 app.get("/messages", authenticateUser, async (req, res) => {
   try {
     const messages = await Message.find()
@@ -145,11 +145,11 @@ app.get("/messages", authenticateUser, async (req, res) => {
     res.status(500).json({ message: "Could not fetch messages" })
   }
 })
-//att authenicateUser finns med i app.post, gör att det krävs en giltig token för att skriva ett meddelande. Detta fanns redan med i koden från början. Uppfyller säkerhetskrav 3. 
+//Säkerhetskrav 3. authenticateUser finns med i app.post, vilket gör att inloggning krävs för att posta ett meddelande. Detta fanns redan med i koden från början. 
 app.post("/messages", authenticateUser, async (req, res) => {
   const text = req.body.message
   if (!text || text.length < 3 || text.length > 140) {
-    return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // detta är en del av säkerhetskrav 10, begränsing av längd på meddelanden.
+    return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // Säkerhetskrav 10. Ändrat begränsning av längd på meddelanden. 
   }
   const message = new Message({ message: req.body.message, user: req.user._id })
   try {
@@ -160,18 +160,18 @@ app.post("/messages", authenticateUser, async (req, res) => {
   }
 })
 
-//backend: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs en giltig token för att redigera ett meddelande. Detta fanns redan med i koden från början.
+//Säkerhetskrav 3: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs att man är inloggad för att redigera ett meddelande. Detta fanns med i koden från början. 
 app.patch("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
     if (!message) return res.status(404).json({ error: "Message not found" })
 
-    //här under säkerställs att endast ägaren av meddelandet kan redigera det, annars kan vem som helst redigera alla meddelanden. detta var med i koden från början och uppfyller säkerhetskrav 4.
+    //Säkerhetskrav 4. Här under säkerställs att endast ägaren av meddelandet kan redigera det, genom att man jämför den inloggades id med id på meddelandet. Annars kan vem som helst redigera alla meddelanden. Detta var med i koden från början. 
     if (message.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "You can only edit your own messages" })
     }
-    // här lägger jag till en kontroll för att säkerställa att meddelandet är mellan 3 och 140 tecken, annars kan användare skicka in väldigt långa eller väldigt korta meddelanden. Detta är en del av säkerhetskrav 10.
+    //Säkerhetskrav 10: Här lägger jag till en kontroll för att säkerställa att meddelandet som redigeras är mellan 3 och 140 tecken. 
     const editedText = req.body.editedMessage
     if (!editedText || editedText.length < 3 || editedText.length > 140) {
       return res.status(400).json({ error: "Message must be between 3 and 140 characters" })
@@ -186,16 +186,15 @@ app.patch("/messages/:id", authenticateUser, async (req, res) => {
   }
 })
 
-// La till authenticateUser. Det löser delvis krav 4, alltså att ägarskap ska kontrolleras innan radering av meddelanden. 
+// Säkerhetskrav 3/4: La till authenticateUser vid radering av meddelande, vilket gör att man måste vara inloggad för att ändra meddelande. 
 app.delete("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
     if (!message) return res.status(404).json({ error: "Message not found" })
 
-    // här lägger jag till en kontroll för att säkerställa att endast ägaren av meddelandet kan radera det, annars kan vem som helst radera alla meddelanden. Säkerhetskrav 4. 
+    // Säkerhetskrav 4. Här lägger jag till samma kontroll som finns vid redigering av meddelande för att säkerställa att endast ägaren av meddelandet kan radera det. Jämförelse av den inloggades id och meddelandets id. 
     if (message.user.toString() !== req.user._id.toString()) {
-      console.log(`BLOCKED: User ${req.user._id} tried to delete message owned by ${message.user}`) //console.log för att testa så att det fungerar
       return res.status(403).json({ error: "You can only delete your own messages" })
     }
 

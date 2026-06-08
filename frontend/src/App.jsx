@@ -11,7 +11,7 @@ export const App = () => {
   const [modal, setModal] = useState(null)
   const [error, setError] = useState(null)
 
-  //nedan är ny fetchPosts variabel. När vi la till authenticateUser på GET /messages i backenden som en del av säkerhetskrav 3, att endast inloggade ska kunna se meddelanden, behövde frontenden också skicka med JWT-token i varje anrop, annars svarar backenden med 401 och inga meddelanden visas. Funktionen hämtar nu meddelanden från backenden och skickar  med en Authorization-header som innehåller användarens JWT-token. Backenden använder token för att verifiera att användaren är inloggad innan den returnerar meddelandena. Utan token blockeras anropet av authenticateUser-middleware och inga meddelanden skickas tillbaka.
+  //Säkerhetskrav 3: Nedan är ny fetchPosts variabel. När vi la till authenticateUser på GET /messages i backenden som en del av säkerhetskrav 3, att endast inloggade ska kunna se meddelanden, behövde frontenden också skicka med JWT-token i varje anrop, annars svarar backenden med 401 och inga meddelanden visas. Funktionen hämtar nu meddelanden från backenden och skickar  med en Authorization-header som innehåller användarens JWT-token. Backenden använder token för att verifiera att användaren är inloggad innan den returnerar meddelandena. Utan token blockeras anropet av authenticateUser-middleware och inga meddelanden skickas tillbaka.
   const fetchPosts = () => {
     setLoading(true)
     fetch(`${BASE_URL}/messages`, {
@@ -29,7 +29,7 @@ export const App = () => {
     if (user) fetchPosts()
   }, [user])
 
-  // ovan har gjorts om för att endast inloggade användare ska kunna se meddelanden. Nedan är den tidigare versionen där fetchPosts kördes varje gång appen laddades, oavsett om en användare var inloggad eller inte. Det är en del av mitt säkerhetskrav 4, alltså att endast autentiserade användare ska kunna se meddelanden.
+  // Säkerhetskrav 3. Ovan har gjorts om för att endast inloggade användare ska kunna se meddelanden. Nedan är den tidigare versionen där fetchPosts kördes varje gång appen laddades, oavsett om en användare var inloggad eller inte. 
   //useEffect(() => {
   //  fetchPosts()
   // }, [])
@@ -92,6 +92,6 @@ export const App = () => {
         user={user}
         onUnauthorized={handleUnauthorized}
       />}
-    </> //La till {user && så att Messagelist bara renderas om användaren är inloggad, så att ej autentiserade användare inte kan se meddelanden — del av säkerhetskrav 3
+    </> //Säkerhetskrav 3: La till {user && så att Messagelist bara renderas om användaren är inloggad, så att icke-autentiserade användare inte kan se meddelanden. 
   )
 }

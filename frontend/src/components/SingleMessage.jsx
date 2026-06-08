@@ -29,7 +29,7 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
   }
 
   const onSave = async () => {
-    //lägger här in validering i frontenden att meddelande som redigeras måste vara mellan 3 och 140 tecken. säkerhetskrav 10. 
+    //säkerhetskrav 10. Lägger här in validering i frontenden att meddelande som redigeras måste vara mellan 3 och 140 tecken.
     if (editedText.length < 3 || editedText.length > 140) {
       setEditError("Message must be between 3 and 140 characters")
       return
@@ -87,12 +87,12 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
           </div>
         )}
 
-        {/* för att endast ägaren av meddelandet ska kunna radera har isOwner lagts till som villkor på deleteknappen. Då visas den inte för andra användare, vilket är en del av mitt säkerhetskrav 4. */}
+        {/* Säkerhetskrav 4. För att endast ägaren av meddelandet ska kunna radera har isOwner lagts till som villkor på deleteknappen. Det gör att delete-knappen bara visas för användare som äger meddelandet. Kosmetisk del, det riktiga skyddet sitter i backend.  */}
         <div className="message-actions">
           {isOwner && <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>}
 
           {isOwner && !isEditing && (
-            <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button> // “edit”-knappen dyker bara upp för den som är inloggad och äger meddelandet. Detta var redan med från början. Säkerhetskrav 3 och 4.
+            <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button> // Säkerhetskrav 4. “Edit”-knappen dyker bara upp för den som är inloggad och äger meddelandet (geno isOWner) Detta var med i koden redan från början.
           )}
 
           {isOwner && isEditing && (
