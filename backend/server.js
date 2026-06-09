@@ -10,8 +10,9 @@ import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
-import { loginLimiter } from "./middleware/rateLimiter.js"
-// Säkerhetskrav 6: Importerar middlewaren loginLimiter
+import { loginLimiter, generalLimiter } from "./middleware/rateLimiter.js"
+// Säkerhetskrav 6: Importerar middlewaren loginLimiter 
+//fas 3: importerar även nya ratelimitern generalLimiter
 import mongoSanitize from "express-mongo-sanitize" //Säkerhetskrav 1: Importerar för att sanera input och skydda mot NoSQL-injection. 
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
@@ -31,7 +32,8 @@ app.get("/", (req, res) => {
   res.send(listEndpoints(app))
 })
 
-app.post("/register", async (req, res) => {
+//applicerar generalLimiter
+app.post("/register", generalLimiter, async (req, res) => {
   try {
     const { email, password, username } = req.body
 
@@ -133,7 +135,8 @@ app.post("/login", loginLimiter, async (req, res) => {
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
 //Säkerhetskrav 3. Lagt till middlewaren authenticateUser så att endast inloggade användare kan se meddelanden.
-app.get("/messages", authenticateUser, async (req, res) => {
+// fas 3: lägger till generalLimiter
+app.get("/messages", authenticateUser, generalLimiter, async (req, res) => {
   try {
     const messages = await Message.find()
       .sort({ createdAt: "desc" })
@@ -146,7 +149,8 @@ app.get("/messages", authenticateUser, async (req, res) => {
   }
 })
 //Säkerhetskrav 3. authenticateUser finns med i app.post, vilket gör att inloggning krävs för att posta ett meddelande. Detta fanns redan med i koden från början. 
-app.post("/messages", authenticateUser, async (req, res) => {
+//fas 3: lägger till generalLimiter
+app.post("/messages", authenticateUser, generalLimiter, async (req, res) => {
   const text = req.body.message
   if (!text || text.length < 3 || text.length > 140) {
     return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // Säkerhetskrav 10. Ändrat begränsning av längd på meddelanden. 
@@ -161,7 +165,8 @@ app.post("/messages", authenticateUser, async (req, res) => {
 })
 
 //Säkerhetskrav 3: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs att man är inloggad för att redigera ett meddelande. Detta fanns med i koden från början. 
-app.patch("/messages/:id", authenticateUser, async (req, res) => {
+//fas 3: lägger till generalLimiter
+app.patch("/messages/:id", authenticateUser, generalLimiter, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
@@ -187,7 +192,8 @@ app.patch("/messages/:id", authenticateUser, async (req, res) => {
 })
 
 // Säkerhetskrav 3/4: La till authenticateUser vid radering av meddelande, vilket gör att man måste vara inloggad för att ändra meddelande. 
-app.delete("/messages/:id", authenticateUser, async (req, res) => {
+//fas 3: lägger till generalLimiter
+app.delete("/messages/:id", authenticateUser, generalLimiter, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
