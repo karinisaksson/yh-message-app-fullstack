@@ -20,11 +20,12 @@ if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 const PORT = process.env.PORT || "3000"
 const app = express()
 app.use(helmet())
+// app.use(cors({
+// origin: "*"
 app.use(cors({
-  origin: "*", //Extra: app.use(cors inställt med * som origin innebär att alla domäner på internet kan skicka requests till min API. Det kan bli ett säkerhetsproblem, och är dålig praxis i produktion. 
-  // bör ändras till app.use(cors({origin: min-frontends-url}))
+  origin: "http://localhost:5173",
+})) // fas 3: ändrat så att bara frontend får skicka requests till API/backend. När det var * som origin kunde vilken domän som helst skicka requests till min backend. Hittade detta själv men åtgärdade i fas 3 efter att även CodeQL påpekat det. 
 
-}))
 app.use(express.json())
 app.use(mongoSanitize()) //Säkerhetskrav 1. Här används mongoSanitize för att sanera input och skydda mot NoSQL-injection. Vilket innebär att all inkommande request-data (body, params, query) automatiskt rensas från MongoDB-operatorer som $ och . innan de når någon route.
 
