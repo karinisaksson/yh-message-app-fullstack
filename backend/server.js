@@ -136,7 +136,7 @@ const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
 //Säkerhetskrav 3. Lagt till middlewaren authenticateUser så att endast inloggade användare kan se meddelanden.
 // fas 3: lägger till generalLimiter
-app.get("/messages", authenticateUser, generalLimiter, async (req, res) => {
+app.get("/messages", generalLimiter, authenticateUser, async (req, res) => {
   try {
     const messages = await Message.find()
       .sort({ createdAt: "desc" })
@@ -150,7 +150,7 @@ app.get("/messages", authenticateUser, generalLimiter, async (req, res) => {
 })
 //Säkerhetskrav 3. authenticateUser finns med i app.post, vilket gör att inloggning krävs för att posta ett meddelande. Detta fanns redan med i koden från början. 
 //fas 3: lägger till generalLimiter
-app.post("/messages", authenticateUser, generalLimiter, async (req, res) => {
+app.post("/messages", generalLimiter, authenticateUser, async (req, res) => {
   const text = req.body.message
   if (!text || text.length < 3 || text.length > 140) {
     return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // Säkerhetskrav 10. Ändrat begränsning av längd på meddelanden. 
@@ -166,7 +166,7 @@ app.post("/messages", authenticateUser, generalLimiter, async (req, res) => {
 
 //Säkerhetskrav 3: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs att man är inloggad för att redigera ett meddelande. Detta fanns med i koden från början. 
 //fas 3: lägger till generalLimiter
-app.patch("/messages/:id", authenticateUser, generalLimiter, async (req, res) => {
+app.patch("/messages/:id", generalLimiter, authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
@@ -193,7 +193,7 @@ app.patch("/messages/:id", authenticateUser, generalLimiter, async (req, res) =>
 
 // Säkerhetskrav 3/4: La till authenticateUser vid radering av meddelande, vilket gör att man måste vara inloggad för att ändra meddelande. 
 //fas 3: lägger till generalLimiter
-app.delete("/messages/:id", authenticateUser, generalLimiter, async (req, res) => {
+app.delete("/messages/:id", generalLimiter, authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
