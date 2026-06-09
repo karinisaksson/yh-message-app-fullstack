@@ -25,16 +25,15 @@ app.use(helmet())
 app.use(cors({
   origin: "http://localhost:5173",
 })) // fas 3: ändrat så att bara frontend får skicka requests till API/backend. När det var * som origin kunde vilken domän som helst skicka requests till min backend. Hittade detta själv men åtgärdade i fas 3 efter att även CodeQL påpekat det. 
-
 app.use(express.json())
 app.use(mongoSanitize()) //Säkerhetskrav 1. Här används mongoSanitize för att sanera input och skydda mot NoSQL-injection. Vilket innebär att all inkommande request-data (body, params, query) automatiskt rensas från MongoDB-operatorer som $ och . innan de når någon route.
+app.use(generalLimiter) // fas 3: använder generalLimiter globalt på alla endpoints, vilket gör att alla nya rutter skyddas automatiskt istället för att lägga till limitern manuellt vid varje ny endpoint. 
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
 })
 
-//applicerar generalLimiter
-app.post("/register", generalLimiter, async (req, res) => {
+app.post("/register", async (req, res) => {
   try {
     const { email, password, username } = req.body
 
@@ -136,8 +135,7 @@ app.post("/login", loginLimiter, async (req, res) => {
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
 //Säkerhetskrav 3. Lagt till middlewaren authenticateUser så att endast inloggade användare kan se meddelanden.
-// fas 3: lägger till generalLimiter
-app.get("/messages", generalLimiter, authenticateUser, async (req, res) => {
+app.get("/messages", authenticateUser, async (req, res) => {
   try {
     const messages = await Message.find()
       .sort({ createdAt: "desc" })
@@ -150,8 +148,7 @@ app.get("/messages", generalLimiter, authenticateUser, async (req, res) => {
   }
 })
 //Säkerhetskrav 3. authenticateUser finns med i app.post, vilket gör att inloggning krävs för att posta ett meddelande. Detta fanns redan med i koden från början. 
-//fas 3: lägger till generalLimiter
-app.post("/messages", generalLimiter, authenticateUser, async (req, res) => {
+app.post("/messages", authenticateUser, async (req, res) => {
   const text = req.body.message
   if (!text || text.length < 3 || text.length > 140) {
     return res.status(400).json({ message: "Message must be between 3 and 140 characters" }) // Säkerhetskrav 10. Ändrat begränsning av längd på meddelanden. 
@@ -166,8 +163,7 @@ app.post("/messages", generalLimiter, authenticateUser, async (req, res) => {
 })
 
 //Säkerhetskrav 3: Att authenicateUser finns med i app.patch(“/messages/:id gör att det krävs att man är inloggad för att redigera ett meddelande. Detta fanns med i koden från början. 
-//fas 3: lägger till generalLimiter
-app.patch("/messages/:id", generalLimiter, authenticateUser, async (req, res) => {
+app.patch("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
@@ -193,8 +189,7 @@ app.patch("/messages/:id", generalLimiter, authenticateUser, async (req, res) =>
 })
 
 // Säkerhetskrav 3/4: La till authenticateUser vid radering av meddelande, vilket gör att man måste vara inloggad för att ändra meddelande. 
-//fas 3: lägger till generalLimiter
-app.delete("/messages/:id", generalLimiter, authenticateUser, async (req, res) => {
+app.delete("/messages/:id", authenticateUser, async (req, res) => {
   if (!isValidId(req.params.id)) return res.status(400).json({ error: "Invalid message ID" })
   try {
     const message = await Message.findById(req.params.id)
