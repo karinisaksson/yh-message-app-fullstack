@@ -6,7 +6,7 @@ Jag använde mig av CodeQL och Dependabot i GitHub för att granska koden.
 
 **CORS-konfiguration** 1 av CodeQL-larmen var CORS-sårbarheten som jag redan hittat själv i fas 2. Att CORS-konfigurationen var för slapp mappar jag mot OWASP 2025 A02: Security Misconfiguration. Det är åtgärdat genom att jag ändrade origin från "*" till "http://localhost:5173". I en deployad version skulle det ändras till min frontend-URL.
 
-**Rate limiting** 8 av 9 larm i CodeQL. Utan rate limiting på endpointsen kan en angripare skicka tusentals requests per sekund till API:et, vilket överlastar servern och gör tjänsten otillgänglig för riktiga användare (DoS). Detta mappar jag mot OWASP 2025: A04: Insecure Design.
+**Rate limiting** 8 av 9 larm i CodeQL. Utan rate limiting på endpointsen kan en angripare skicka tusentals requests per sekund till API:et, vilket överlastar servern och gör tjänsten otillgänglig för riktiga användare (DoS). Detta mappar jag mot OWASP 2025: A06: Insecure Design.
 
 För att åtgärda detta skapade jag en ny middleware i rateLimiter.js, som jag döpte till generalLimiter som tillåter som mest 100 requests per IP under 15 minuter.
 
