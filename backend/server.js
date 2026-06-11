@@ -58,10 +58,11 @@ app.post("/register", async (req, res) => {
     const user = new User({ username: username.trim(), email, password: hashedPassword })
     await user.save()
 
+    /// Anger algoritmen explicit så signering och verifiering inte kan glida isär ifall default-algoritmen i JWT-biblioteket ändras. 
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h", algorithm: "HS256" }
     )
 
     res.status(201).json({

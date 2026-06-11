@@ -7,7 +7,7 @@ export const authenticateUser = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "No token provided" })
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] }) //fas 3: Låser verifieringen till algoritmen HS256 så att tokens inte kan godkännas med "none"-algoritm eller annan algoritm. 
     const user = await User.findById(decoded.userId)
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found" })
