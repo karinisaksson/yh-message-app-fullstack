@@ -108,11 +108,11 @@ app.post("/login", loginLimiter, async (req, res) => {
         response: null,
       })
     }
-
+    /// fas 3: Anger algoritmen explicit så signering och verifiering inte kan glida isär ifall default-algoritmen i JWT-biblioteket ändras. 
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h", algorithm: "HS256" }
     )
 
     res.json({
