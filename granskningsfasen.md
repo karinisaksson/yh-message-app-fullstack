@@ -37,3 +37,7 @@ Efter att ha granskat min kod kan jag konstatera att som koden ser ut nu var var
 tar körs bara vid installation, inte av min kod, och kan bara utnyttjas om ett manipulerat arkiv matas in i nedladdningssteget. En riktad attack mot just min nedladdning är osannolik, men leveranskedjeattacker behöver inte vara riktade: om någon planterar skadlig kod i en populär källa drabbas alla som laddar ner därifrån, oavsett hur litet projektet är. Den sortens attack har hänt flera gånger i verkligheten, och konsekvensen hade varit allvarlig (kodkörning på utvecklarens dator), vilket motiverade åtgärd trots att mitt enskilda projekt är ett osannolikt mål.
 
 Två av Vite-larmen var Windows-specifika och därför inte aktuella på min Mac, medan de återstående Vite- och esbuild-larmen krävde att utvecklingsservern var igång och kunde nås av manipulerade förfrågningar, i praktiken genom att jag besöker en illvillig webbsida medan servern kördes. Det är en smal attackväg som bara är relevant under aktiv utveckling, inte i den färdiga appen.
+
+## Slutsats
+
+Både CodeQL och Dependabot larmade om sårbarheter som jag inte hittat själv, vid manuell granskning (där jag tog hjälp av Claude Code). Det känns viktigt att kunna använda sådana  verktyg, speciellt när utvecklingscommunityt är byggt på att man använder andras bibliotek. Det hade varit väldigt svårt att hålla koll på vilka sårbarheter man drar in annars. Jag löste alla dependabot-larmen, men var noga med att testa alla appens funktioner efter varje uppdatering för att inget skulle gå sönder. 
